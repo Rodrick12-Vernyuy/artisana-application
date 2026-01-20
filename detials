@@ -1,0 +1,151 @@
+import 'package:flutter/material.dart';
+import 'dart:io';
+import '../models/product.dart';
+import '../managers/rating_manager.dart';
+import '../managers/cart_manager.dart';
+
+class DetailScreen extends StatelessWidget {
+  final Product product;
+  const DetailScreen({super.key, required this.product});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Stack(
+        children: [
+          Column(
+            children: [
+              Expanded(
+                flex: 2,
+                child: product.imageUrl.startsWith('http')
+                    ? Image.network(
+                        product.imageUrl,
+                        width: double.infinity,
+                        fit: BoxFit.cover,
+                        errorBuilder: (c, e, s) =>
+                            const Icon(Icons.image, size: 100),
+                      )
+                    : Image.file(
+                        File(product.imageUrl),
+                        width: double.infinity,
+                        fit: BoxFit.cover,
+                        errorBuilder: (c, e, s) =>
+                            const Icon(Icons.image, size: 100),
+                      ),
+              ),
+              Expanded(
+                flex: 3,
+                child: Container(
+                  padding: const EdgeInsets.all(30),
+                  decoration: const BoxDecoration(
+                    color: Color(0xFFFDF7F0),
+                    borderRadius: BorderRadius.vertical(
+                      top: Radius.circular(40),
+                    ),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            product.category,
+                            style: const TextStyle(color: Color(0xFFD27C4B)),
+                          ),
+                          Row(
+                            children: [
+                              const Icon(Icons.star, color: Colors.amber),
+                              Text(
+                                " ${RatingManager.getRating(product.id)} (12 reviews)",
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 10),
+                      Text(
+                        product.name,
+                        style: const TextStyle(
+                          fontSize: 28,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      const Text(
+                        "Description",
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(height: 10),
+                      Text(
+                        product.description,
+                        style: const TextStyle(color: Colors.grey),
+                      ),
+                      const Spacer(),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text(
+                                "Price",
+                                style: TextStyle(color: Colors.grey),
+                              ),
+                              Text(
+                                "XAF ${product.price}",
+                                style: const TextStyle(
+                                  fontSize: 24,
+                                  fontWeight: FontWeight.bold,
+                                  color: Color(0xFF1B2B3A),
+                                ),
+                              ),
+                            ],
+                          ),
+                          ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Color(0xFFD27C4B),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 40,
+                                vertical: 15,
+                              ),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(15),
+                              ),
+                            ),
+                            onPressed: () {
+                              CartManager.addToCart(product.id);
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(content: Text("Added to Cart")),
+                              );
+                            },
+                            child: const Text(
+                              "Add to Cart",
+                              style: TextStyle(color: Colors.white),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+          SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.all(10.0),
+              child: CircleAvatar(
+                backgroundColor: Colors.white,
+                child: IconButton(
+                  icon: const Icon(Icons.arrow_back, color: Color(0xFF1B2B3A)),
+                  onPressed: () => Navigator.pop(context),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
