@@ -1,0 +1,71 @@
+import 'package:flutter/material.dart';
+import '../models/product.dart';
+import '../managers/product_manager.dart';
+import '../widgets/product_item_card.dart';
+
+class SearchScreen extends StatefulWidget {
+  const SearchScreen({super.key});
+
+  @override
+  State<SearchScreen> createState() => _SearchScreenState();
+}
+
+class _SearchScreenState extends State<SearchScreen> {
+  String query = "";
+
+  @override
+  Widget build(BuildContext context) {
+    return SafeArea(
+      child: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: TextField(
+              onChanged: (v) => setState(() => query = v.toLowerCase()),
+              decoration: InputDecoration(
+                hintText: "Search for crafts...",
+                prefixIcon: const Icon(Icons.search, color: Color(0xFFD27C4B)),
+                filled: true,
+                fillColor: Colors.white,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(15),
+                  borderSide: BorderSide.none,
+                ),
+              ),
+            ),
+          ),
+          Expanded(
+            child: ValueListenableBuilder(
+              valueListenable: ProductManager.products,
+              builder: (context, List<Product> all, _) {
+                final results = all
+                    .where(
+                      (p) =>
+                          p.name.toLowerCase().contains(query) ||
+                          p.category.toLowerCase().contains(query),
+                    )
+                    .toList();
+
+                if (results.isEmpty)
+                  return const Center(child: Text("No crafts found."));
+
+                return GridView.builder(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    childAspectRatio: 0.75,
+                    crossAxisSpacing: 15,
+                    mainAxisSpacing: 15,
+                  ),
+                  itemCount: results.length,
+                  itemBuilder: (context, i) =>
+                      ProductItemCard(product: results[i]),
+                );
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
