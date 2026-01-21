@@ -1,0 +1,11 @@
+// --- State Management (User) ---
+class UserData {
+  String name;
+  String location;
+  String imageUrl;
+  UserData({
+    required this.name,
+    required this.location,
+    required this.imageUrl,
+  });
+}
